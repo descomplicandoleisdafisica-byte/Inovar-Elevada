@@ -1,6 +1,45 @@
 const WHATSAPP_BASE='https://wa.me/555432324898?text=';
 
-document.querySelectorAll('.hero-photo-card img').forEach(image=>{image.src='./assets/store/fachada-foto.svg?v=20260818';});
+// Força a logo oficial enviada pelo usuário em todos os pontos do site e evita cache antigo.
+document.querySelectorAll('img[src*="logo-inovar"]').forEach(image=>{
+  image.src='./assets/brand/logo-inovar.svg?v=20260818-logo-oficial';
+});
+
+// Mantém a foto principal estável.
+document.querySelectorAll('.hero-photo-card img').forEach(image=>{
+  image.src='./assets/store/fachada-foto.svg?v=20260818';
+});
+
+// Garante uma única pergunta de horário no FAQ, com o horário correto.
+const faqList=document.querySelector('.faq-list');
+if(faqList){
+  const hourItems=[...faqList.querySelectorAll('.faq-item')].filter(item=>/horário/i.test(item.textContent));
+  let hourItem=hourItems.shift();
+  hourItems.forEach(item=>item.remove());
+
+  if(!hourItem){
+    hourItem=document.createElement('article');
+    hourItem.className='faq-item';
+    hourItem.innerHTML=`
+      <button type="button" class="faq-question" aria-expanded="false">
+        Qual é o horário de atendimento?
+        <span>+</span>
+      </button>
+      <div class="faq-answer"><p>Segunda a sexta-feira, das 8h às 18h30. Sábado, das 8h às 18h.</p></div>`;
+    faqList.appendChild(hourItem);
+  }else{
+    const button=hourItem.querySelector('.faq-question');
+    const answer=hourItem.querySelector('.faq-answer p');
+    if(button){
+      button.innerHTML='Qual é o horário de atendimento?<span>+</span>';
+      button.setAttribute('aria-expanded','false');
+    }
+    if(answer){
+      answer.textContent='Segunda a sexta-feira, das 8h às 18h30. Sábado, das 8h às 18h.';
+    }
+    hourItem.classList.remove('open');
+  }
+}
 
 function openWhatsApp(message){
   window.open(WHATSAPP_BASE+encodeURIComponent(message),'_blank','noopener');
