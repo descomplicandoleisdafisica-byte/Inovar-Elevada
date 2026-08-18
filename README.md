@@ -2,4 +2,4 @@
 
 Site institucional da Inovar Elevada Materiais de Construção, em Vacaria/RS.
 
-A versão atual foi reconstruída com arquitetura separada em `index.html`, `styles.css` e `app.js`, além de assets próprios para logo e fachada.
+A versão atual usa `index.html`, `styles.css` e `app.js`, com assets próprios para logo e fachada, navegação responsiva, busca via WhatsApp, setores, avaliações, Instagram, Google Maps/Waze e consulta de disponibilidade de entrega.
