@@ -1,0 +1,111 @@
+name: Refinar hero, localização e entrega
+
+on:
+  push:
+    paths:
+      - '.github/workflows/refine-mobile.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Aplicar refinamentos
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          delivery = 'https://wa.me/555432324898?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Inovar%20Elevada%20e%20gostaria%20de%20consultar%20a%20disponibilidade%20de%20entrega.'
+
+          # Topo
+          s = s.replace(
+              '<span>Entrega disponível • <b>Atendimento direto pelo WhatsApp</b></span>',
+              f'<span><a class="delivery-inline" href="{delivery}" target="_blank" rel="noopener">Consultar disponibilidade de entrega</a> • <b>Atendimento direto pelo WhatsApp</b></span>'
+          )
+
+          # Hero: transforma o selo de entrega em CTA real
+          s = s.replace(
+              '<div class="glass-badge delivery-badge"><i>↗</i><span>Entrega disponível<br><small style="font-weight:500;color:#777">consulte condições</small></span></div>',
+              f'<a class="glass-badge delivery-badge delivery-cta" href="{delivery}" target="_blank" rel="noopener" aria-label="Consultar disponibilidade de entrega"><i>↗</i><span>Consultar disponibilidade<br>de entrega</span></a>'
+          )
+
+          # Linha de benefícios
+          s = s.replace(
+              '<div class="proof-item"><div class="proof-icon">↗</div><div><b>Entrega disponível</b><span>Consulte as condições</span></div></div>',
+              f'<a class="proof-item delivery-cta" href="{delivery}" target="_blank" rel="noopener"><div class="proof-icon">↗</div><div><b>Consultar disponibilidade de entrega</b><span>Fale diretamente com a equipe</span></div></a>'
+          )
+
+          # Seção de diferenciais
+          s = s.replace(
+              '<div class="feature-row"><div class="fi">04</div><div><b>Entrega disponível</b><p>Consulte condições diretamente com a equipe.</p></div><span>↗</span></div>',
+              f'<a class="feature-row delivery-cta" href="{delivery}" target="_blank" rel="noopener"><div class="fi">04</div><div><b>Consultar disponibilidade de entrega</b><p>Condições, área atendida e prazo confirmados pela equipe.</p></div><span>↗</span></a>'
+          )
+
+          # Galeria
+          s = s.replace(
+              '<article class="slide"><img src="./assets/art/delivery.svg" alt="Entrega"><div class="slide-caption"><div><b>Entrega disponível</b><small>Consulte condições com a loja</small></div><span class="slide-num">06</span></div></article>',
+              f'<a class="slide delivery-slide" href="{delivery}" target="_blank" rel="noopener"><img src="./assets/art/delivery.svg" alt="Consultar disponibilidade de entrega"><div class="slide-caption"><div><b>Consultar disponibilidade de entrega</b><small>Abra o WhatsApp e confirme com a loja</small></div><span class="slide-num">06</span></div></a>'
+          )
+
+          # FAQ
+          s = s.replace(
+              '<p>Há entrega disponível. As condições, área atendida e prazo devem ser confirmados diretamente com a equipe.</p>',
+              f'<p><a class="faq-delivery" href="{delivery}" target="_blank" rel="noopener">Consultar disponibilidade de entrega pelo WhatsApp.</a> A equipe confirma condições, área atendida e prazo.</p>'
+          )
+
+          # Fallback da foto principal, caso o PNG não seja entregue pelo Pages
+          s = s.replace(
+              '<img src="./assets/store/loja-google-01.png?v=20260818f" alt="Fachada da Inovar Elevada">',
+              '<img src="./assets/store/loja-google-01.png?v=20260818g" alt="Fachada da Inovar Elevada" onerror="this.onerror=null;this.src=\'./assets/art/material-stack.svg\';this.classList.add(\'fallback-art\')">'
+          )
+
+          marker = '/* mobile-refinement-v3 */'
+          if marker not in s:
+              css = r'''
+          /* mobile-refinement-v3 */
+          .delivery-inline{color:#ffb080;font-weight:800;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}.delivery-cta{color:inherit;cursor:pointer}.delivery-badge{transition:transform .22s var(--ease),box-shadow .22s var(--ease),background .22s}.delivery-badge:hover{transform:translateY(-4px)!important;background:rgba(255,255,255,.94);box-shadow:0 22px 55px rgba(45,31,21,.20)}.proof-item.delivery-cta:hover{background:#fff7f1;border-radius:22px}.feature-row.delivery-cta:hover{background:rgba(255,245,237,.7);border-radius:22px;padding-left:12px;padding-right:12px}.faq-delivery{color:var(--od);font-weight:900;text-decoration:underline;text-underline-offset:3px}.delivery-slide{cursor:pointer}.fallback-art{object-fit:cover!important;background:#f7efe6!important}
+          .map-circle{cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s var(--ease)}.map-circle:hover{transform:translateY(-5px);box-shadow:0 40px 95px rgba(49,35,24,.25)}.map-orb:after{content:'Abrir no Google Maps  →';position:absolute;right:8px;bottom:28px;z-index:6;background:#fff;color:var(--ink);padding:13px 18px;border-radius:999px;font-size:10px;font-weight:900;box-shadow:var(--shadow-sm);pointer-events:none}
+          @media(max-width:650px){
+            .hero{padding:30px 0 58px}.hero-grid{gap:18px}.hero-art{min-height:405px;margin-top:2px}.photo-blob{width:78%;height:330px;right:2%;top:30px;border-radius:38% 62% 55% 45% / 34% 38% 62% 66%;box-shadow:0 24px 58px rgba(49,35,24,.18)}.photo-blob img{transform:scale(1.02)}.photo-caption{left:37%;right:14px;bottom:45px;text-align:right}.photo-caption b{font-size:14px}.photo-caption span{font-size:8px;line-height:1.35}.material-orb{width:152px;height:124px;left:0;bottom:13px;padding:6px;box-shadow:0 18px 40px rgba(49,35,24,.16)}.rating-badge{width:80px;height:80px;right:0;top:11px;animation:none}.rating-badge strong{font-size:20px}.rating-badge span{font-size:6.8px;letter-spacing:.06em}.delivery-badge{right:0;bottom:0;max-width:225px;padding:8px 11px;gap:8px;font-size:9px;line-height:1.25;animation:none}.delivery-badge i{width:28px;height:28px;flex:none}.hero-dot{left:43%;top:15px;width:10px;height:10px;box-shadow:0 0 0 8px rgba(243,107,33,.11)}
+            .location{padding:62px 0 58px}.location-grid{gap:22px}.map-orb{min-height:315px;margin-top:8px;display:flex;align-items:center;justify-content:center;flex-direction:column}.map-circle{width:min(100%,330px);height:286px;border-radius:34px}.map-circle:before{inset:-24px;background-size:32px 32px}.r1{width:420px;height:30px;left:-62px;top:112px;transform:rotate(19deg)}.r2{width:350px;height:22px;left:18px;top:188px;transform:rotate(-31deg)}.map-pin{width:64px;height:64px;top:43%;box-shadow:0 14px 28px rgba(243,107,33,.28)}.map-pin:after{width:19px;height:19px}.map-note{bottom:20px;width:215px;padding:10px 14px}.map-note b{font-size:10px}.map-note span{font-size:8px}.map-orb:after{position:static;margin-top:12px;align-self:center;padding:12px 17px}
+          }
+          '''
+              s = s.replace('</style>', css + '\n</style>')
+
+          # Mapa inteiro clicável no Google Maps
+          js_marker = '// map-click-v3'
+          if js_marker not in s:
+              js = r'''
+          // map-click-v3
+          const mapCircle=document.querySelector('.map-circle');
+          if(mapCircle){
+            const mapsUrl='https://www.google.com/maps/dir/?api=1&destination=-28.4940797,-50.9367171';
+            mapCircle.setAttribute('role','link'); mapCircle.setAttribute('tabindex','0'); mapCircle.setAttribute('aria-label','Abrir rota da Inovar Elevada no Google Maps');
+            const goMaps=()=>window.open(mapsUrl,'_blank','noopener');
+            mapCircle.addEventListener('click',goMaps);
+            mapCircle.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goMaps()}});
+          }
+          '''
+              s = s.replace('</script>', js + '\n</script>')
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Publicar alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração necessária"
+          else
+            git commit -m "fix: refinar hero e localização no mobile e tornar entrega clicável"
+            git push
+          fi
