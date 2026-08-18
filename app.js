@@ -1,5 +1,7 @@
 const WHATSAPP_BASE='https://wa.me/555432324898?text=';
 
+document.querySelectorAll('.hero-photo-card img').forEach(image=>{image.src='./assets/store/fachada-foto.svg?v=20260818';});
+
 function openWhatsApp(message){
   window.open(WHATSAPP_BASE+encodeURIComponent(message),'_blank','noopener');
 }
