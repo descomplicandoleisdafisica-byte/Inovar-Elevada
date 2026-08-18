@@ -1,8 +1,8 @@
 const WHATSAPP_BASE='https://wa.me/555432324898?text=';
 
-// Força a logo oficial enviada pelo usuário em todos os pontos do site e evita cache antigo.
+// Usa a logo vetorial estável e força uma URL nova para evitar cache da versão quebrada.
 document.querySelectorAll('img[src*="logo-inovar"]').forEach(image=>{
-  image.src='./assets/brand/logo-inovar.svg?v=20260818-logo-oficial';
+  image.src='./assets/brand/logo-inovar.svg?v=20260818-logo-final-2';
 });
 
 // Mantém a foto principal estável.
