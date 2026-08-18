@@ -4,8 +4,15 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const OUT_DIR = path.join(ROOT, 'assets', 'stories');
 const DATA_DIR = path.join(ROOT, 'data');
-const ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
-const USER_ID = process.env.INSTAGRAM_USER_ID;
+
+const cleanSecret = (value = '') => String(value)
+  .trim()
+  .replace(/^Bearer\s+/i, '')
+  .replace(/^['"]|['"]$/g, '')
+  .trim();
+
+const ACCESS_TOKEN = cleanSecret(process.env.INSTAGRAM_ACCESS_TOKEN);
+const USER_ID = cleanSecret(process.env.INSTAGRAM_USER_ID);
 const API_VERSION = process.env.INSTAGRAM_API_VERSION || 'v23.0';
 const API_BASE = process.env.INSTAGRAM_API_BASE || 'https://graph.facebook.com';
 
@@ -21,7 +28,13 @@ const graph = async (pathname, params = {}) => {
   const url = new URL(`${API_BASE}/${API_VERSION}/${pathname}`);
   Object.entries({ ...params, access_token: ACCESS_TOKEN }).forEach(([k, v]) => url.searchParams.set(k, String(v)));
   const res = await fetch(url, { headers: { 'User-Agent': 'InovarElevadaSite/1.0' } });
-  if (!res.ok) throw new Error(`Instagram API ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+    const body = await res.text();
+    if (res.status === 400 && /Malformed access token/i.test(body)) {
+      throw new Error('Token da Meta inválido ou malformado. Atualize o Secret INSTAGRAM_ACCESS_TOKEN com um Page Access Token real, sem aspas e sem o prefixo Bearer.');
+    }
+    throw new Error(`Instagram API ${res.status}: ${body}`);
+  }
   return res.json();
 };
 
