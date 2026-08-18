@@ -1,13 +1,13 @@
 const WHATSAPP_BASE='https://wa.me/555432324898?text=';
 
-// Usa a logo vetorial estável e força uma URL nova para evitar cache da versão quebrada.
+// Usa a logo aprovada e força uma URL nova para evitar cache da versão anterior.
 document.querySelectorAll('img[src*="logo-inovar"]').forEach(image=>{
-  image.src='./assets/brand/logo-inovar.svg?v=20260818-logo-final-2';
+  image.src='./assets/brand/logo-inovar.svg?v=20260818-logo-aprovada';
 });
 
-// Mantém a foto principal estável.
+// Usa a nova fachada em alta resolução e força atualização de cache.
 document.querySelectorAll('.hero-photo-card img').forEach(image=>{
-  image.src='./assets/store/fachada-foto.svg?v=20260818';
+  image.src='./assets/store/fachada-foto.svg?v=20260818-fachada-hq';
 });
 
 // Garante uma única pergunta de horário no FAQ, com o horário correto.
